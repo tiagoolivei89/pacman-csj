@@ -328,6 +328,20 @@ body{
   aspect-ratio:952 / 1054;
   margin:0 auto;
 }
+/* No celular o quadro de fases já fica escondido (ver @media 1300px mais
+   abaixo) e o ranking desce pra baixo do labirinto em vez de ficar do lado
+   (ver @media 980px) — então o labirinto pode (e deve) ocupar quase a tela
+   toda, sem precisar sobrar espaço pros painéis ao lado. Também encolhe a
+   margem do body, que senão "comia" uma faixa fixa da largura disponível
+   independente do tamanho da tela.
+   Duas condições (não só max-width): celular em pé é estreito (largura
+   pequena), mas celular deitado é BAIXO (altura pequena, largura grande) —
+   sem o "or" por altura, o modo paisagem ficava de fora e continuava
+   usando a fórmula antiga, pequena. */
+@media (max-width:700px), (max-height:500px){
+  body{ padding:6px; }
+  .game-wrap{ width:min(97vw, calc(90vh * 952 / 1054)); }
+}
 .overlay{
   position:absolute; inset:0;
   display:none; align-items:center; justify-content:center; flex-direction:column;
