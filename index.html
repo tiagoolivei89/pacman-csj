@@ -927,11 +927,23 @@ const CHAVE_STORAGE_VELOCIDADE = "pacmanCSJ_velocidade_v1";
 // multiplicador aplicado em cima de VELOCIDADE_BASE na hora de criar o
 // jogador/fantasmas/galinhas/ETzinhos de uma partida nova — ver criarFantasma,
 // criarGalinha, criarEtzinho, invocarChefao e o objeto "jogador" dentro de
-// iniciarPartida(). 1.0 = normal (sem alterar nada), 1.10 = rápido (+10%),
-// 1.20 = extremo (+20%), ou 1 + (%/100) do campo "personalizado".
+// iniciarPartida().
+//
+// "Normal" NÃO é mais 0% (1.0) — foi ajustado em duas rodadas: primeiro pra
+// +15% (1.15), depois mais +50% EM CIMA desse valor (1.15 * 1.5 = 1.725),
+// ou seja, "normal" hoje é +72,5% sobre a velocidade original do jogo. As
+// demais opções (Rápido +10%, Extremo +20%, Personalizado) continuam sendo
+// calculadas EM CIMA do normal atual, não da velocidade original — ou seja,
+// "Rápido" é 10% mais rápido que o Normal (que já é +72,5%), não 10% mais
+// rápido que a velocidade original. Ver VELOCIDADE_NORMAL abaixo.
 let velocidadeMultiplicador = 1.0;
 
-const OPCOES_VELOCIDADE_FIXAS = { normal:1.0, rapido:1.10, extremo:1.20 };
+const VELOCIDADE_NORMAL = 1.15 * 1.5; // = 1.725 -> "normal" = +72,5% sobre a velocidade original do jogo
+const OPCOES_VELOCIDADE_FIXAS = {
+  normal: VELOCIDADE_NORMAL,
+  rapido: VELOCIDADE_NORMAL * 1.10,   // +10% em cima do normal
+  extremo: VELOCIDADE_NORMAL * 1.20,  // +20% em cima do normal
+};
 
 function carregarConfigVelocidade(){
   try{
@@ -956,10 +968,11 @@ function aplicarModoVelocidade(modo){
   if(modo === "personalizado"){
     campoCustom.classList.add("mostrar");
     const pct = Math.max(0, Number(inputCustom.value) || 0);
-    velocidadeMultiplicador = 1 + (pct/100);
+    // também calculado em cima do normal (+15%), não da velocidade original
+    velocidadeMultiplicador = VELOCIDADE_NORMAL * (1 + pct/100);
   }else{
     campoCustom.classList.remove("mostrar");
-    velocidadeMultiplicador = OPCOES_VELOCIDADE_FIXAS[modo] ?? 1.0;
+    velocidadeMultiplicador = OPCOES_VELOCIDADE_FIXAS[modo] ?? VELOCIDADE_NORMAL;
   }
   salvarConfigVelocidade(modo, Number(inputCustom.value) || 0);
 }
